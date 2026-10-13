@@ -306,7 +306,7 @@ nav.tabs button[aria-selected="true"]{background:var(--ink);border-color:var(--i
       <h1>量價羅盤</h1>
       <p>台股智能選股：評分、進場區間、停利與停損，一次看清楚</p>
     </div>
-    <div class="stamp"><span id="liveChip" class="live off"><i></i><span>收盤快照</span></span><br>資料截至 <b class="num" id="asof"></b> <span id="asofTag">收盤</span><br>來源 證交所＋Yahoo Finance · 上市股票 <span id="cnt"></span> 檔</div>
+    <div class="stamp"><span id="liveChip" class="live off"><i></i><span>收盤快照</span></span><br>資料截至 <b class="num" id="asof"></b> <span id="asofTag">收盤</span><br>來源 證交所＋Yahoo Finance · 股票 <span id="cnt"></span> 檔 · ETF <span id="cntE"></span> 檔</div>
   </header>
 
   <div class="topbar">
@@ -326,6 +326,12 @@ nav.tabs button[aria-selected="true"]{background:var(--ink);border-color:var(--i
   <section class="view" id="v-pick" hidden>
     <p class="intro">依趨勢、動能、量能、相對強弱與法人籌碼五項打分（滿分 100）。70 分以上為「偏多布局」，點任一檔看完整進出場計畫，點星號加入自選。</p>
     <div class="presets" id="presets">
+      <span class="lab">類型</span>
+      <button class="chip" aria-pressed="true" data-t="all">全部</button>
+      <button class="chip" aria-pressed="false" data-t="stock">股票</button>
+      <button class="chip" aria-pressed="false" data-t="etf">ETF</button>
+    </div>
+    <div class="presets">
       <span class="lab">快速情境</span>
       <button class="chip" aria-pressed="true" data-p="">不限</button>
       <button class="chip" aria-pressed="false" data-p="fresh">今日新轉偏多</button>
@@ -493,7 +499,7 @@ function backtest(S,B){
 
 /* ---------- 建立全體資料 ---------- */
 let B,ALL,TX,LAST;
-const IDS=Object.keys(RAW.s).filter(k=>k!==BENCH);
+const IDS=Object.keys(RAW.s);
 function recompute(){
 B=build(BENCH);
 ALL=IDS.map(id=>{
@@ -530,6 +536,9 @@ let PORT=store.get("lpk-port",[]).filter(h=>BY[h.id]);
 let READ=store.get("lpk-learn",[]);
 let RECENT=store.get("lpk-recent",[]).filter(id=>BY[id]);
 const isW=id=>WATCH.includes(id);
+const isETF=a=>(a.S.ind||"").startsWith("ETF");
+const isLev=a=>/槓桿|反向/.test(a.S.ind||"");
+function setCounts(){const e=ALL.filter(isETF).length;$("#cnt").textContent=(ALL.length-e).toLocaleString();$("#cntE").textContent=e.toLocaleString()}
 const rtLink=(id,t)=>`<a class="rt" href="https://www.wantgoo.com/stock/${id}" target="_blank" rel="noopener">${t} ↗</a>`;
 const starBtn=id=>`<button class="star" data-star="${id}" aria-pressed="${isW(id)}" aria-label="${isW(id)?"移出":"加入"}自選">${STAR}</button>`;
 function toast(t){const e=$("#toast");e.textContent=t;e.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>e.hidden=true,2200)}
@@ -585,6 +594,7 @@ const GL=[
   ["SIZE","部位控管（單筆風險 %）","每筆交易最多只虧總資金的 1%。買幾股 = 可承受虧損 ÷（進價 − 停損）。這樣連錯十次也只少一成資金。",null]]],
  ["交易常識",[
   ["TICK","升降單位","台股價格跳動的最小單位：10 元以下 0.01、10–50 元 0.05、50–100 元 0.1、100–500 元 0.5、500–1000 元 1、1000 元以上 5。本工具的價位都已取整。",null],
+  ["ETF","ETF 類型","ETF 是一次買進一籃子股票或債券的基金，在股市像股票一樣交易。股票型追蹤大盤或主題；高股息挑配息高的股票；債券型（代號尾碼 B）波動小、和股市常反向；槓桿型（L）是指數 2 倍、反向型（R）是 −1 倍，都每天重新平衡，只適合短線。主動式（A）由經理人選股。",null],
   ["ODD","零股","不到 1,000 股（1 張）的交易。資金少也能買高價股，盤中零股可即時成交，適合分批布局。",null],
   ["COST","交易成本","手續費買賣各 0.1425%（券商常有折扣），賣出加證交稅 0.3%（ETF 0.1%）。來回約 0.585%，短線進出太頻繁會被成本吃掉。",null],
   ["BT","回測","把同一套規則套在過去的資料上，看會賺還是賠。只能檢查規則合不合理，不能保證未來。",null],
@@ -611,7 +621,7 @@ function closeSheet(){$("#ov").hidden=true}
 $("#ov").addEventListener("click",e=>{if(e.target.id==="ov"||e.target.closest("[data-close]"))closeSheet()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#ov").hidden)closeSheet();if(e.key==="/"&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();openSearch()}});
 function matches(q){q=q.trim();if(!q)return[];return ALL.filter(a=>a.S.id.startsWith(q)||a.S.name.includes(q)).sort((x,y)=>(y.S.id===q)-(x.S.id===q)||(y.S.id.startsWith(q))-(x.S.id.startsWith(q))||y.liq-x.liq).slice(0,8)}
-const POPULAR=["2330","2317","2454","2308","2382","2603","2881","2002","3231","2303"].filter(id=>BY[id]);
+const POPULAR=["2330","2317","2454","0050","00878","2308","2382","2603","0056","00679B","2881","3231"].filter(id=>BY[id]);
 const resBtn=a=>`<button data-pick="${a.S.id}"><span><b>${a.S.name}</b><span class="id num">${a.S.id}</span></span><span class="num ${cls(a.chg)}">${fmtP(a.S.c[a.i])} ${pct(a.chg)}</span><span class="pill ${a.sig.c}">${a.sc.total}</span></button>`;
 function openSearch(){
   sheet(`<h3>快速查股</h3><div class="sx"><input id="sq" type="search" placeholder="代號或名稱，例如 2330、聯發科" aria-label="代號或名稱" autocomplete="off"><button class="btn" data-close>關閉</button></div><div class="res" id="sres"></div>
@@ -627,22 +637,23 @@ function openStock(id){closeSheet();showStock(id);go("stock");window.scrollTo({t
 /* ---------- 大盤 ---------- */
 function marketHTML(){
   const i=B.n-1,bc=B.c[i],tn=TX.length-1,tx=TX[tn],txc=tx/TX[tn-1]-1;
-  const up=ALL.filter(a=>a.chg>0).length,dn=ALL.filter(a=>a.chg<0).length;
-  const above=ALL.filter(a=>a.S.c[a.i]>a.S.ma20[a.i]).length/ALL.length;
-  const bull=ALL.filter(a=>a.sig.k==="bull").length,bear=ALL.filter(a=>a.sig.k==="bear").length;
+  const STK=ALL.filter(a=>!isETF(a));
+  const up=STK.filter(a=>a.chg>0).length,dn=STK.filter(a=>a.chg<0).length;
+  const above=STK.filter(a=>a.S.c[a.i]>a.S.ma20[a.i]).length/STK.length;
+  const bull=STK.filter(a=>a.sig.k==="bull").length,bear=STK.filter(a=>a.sig.k==="bear").length;
   const bTrend=bc>B.ma20[i]&&B.ma20[i]>B.ma60[i]?"多頭排列":bc>B.ma20[i]?"站上月線":"月線之下";
   const temp=above>0.65?"偏熱":above>0.4?"中性":"偏冷";
   const advice=above>0.65?"多數股票在月線上，行情偏熱：可以做多，但別追高，嚴守停損。":above>0.4?"多空互見：挑評分 70 以上、量價配合的個股，資金分批。":"多數股票在月線下，行情偏冷：降低持股、縮小部位，空手等待也是策略。";
   return {html:`<div class="market" style="margin-top:0">
    <div><div class="lab">加權指數</div><div class="val num">${tx.toLocaleString("zh-TW",{maximumFractionDigits:2})} <small class="${cls(txc)}" style="font-size:13px">${pct(txc)}</small></div><div class="sub">0050 ${fmtP(bc)}（${bTrend}）</div></div>
    <div><div class="lab">市場溫度（站上月線比例）${qBtn("MA20")}</div><div class="val num">${(above*100).toFixed(0)}% <small style="font-size:13px;color:var(--muted)">${temp}</small></div><div class="therm"><i style="left:calc(${(above*100).toFixed(0)}% - 1px)"></i></div></div>
-   <div><div class="lab">訊號分布 ${qBtn("SCORE")}</div><div class="val num"><span class="up">${bull}</span> / <span style="color:var(--gold)">${ALL.length-bull-bear}</span> / <span class="down">${bear}</span></div><div class="sub">偏多 / 觀察 / 迴避</div></div>
+   <div><div class="lab">訊號分布 ${qBtn("SCORE")}</div><div class="val num"><span class="up">${bull}</span> / <span style="color:var(--gold)">${STK.length-bull-bear}</span> / <span class="down">${bear}</span></div><div class="sub">偏多 / 觀察 / 迴避（股票）</div></div>
    <div><div class="lab">今日漲跌家數</div><div class="val num"><span class="up">${up}</span> / <span class="down">${dn}</span></div><div class="sub">上漲 / 下跌（上市普通股）</div></div></div>
    <p class="intro" style="margin:8px 0 0"><b style="color:var(--ink)">今日操作溫度計：</b>${advice}</p>${liveNote()}`};
 }
 
 /* ---------- 總覽 ---------- */
-const topPicks=()=>ALL.filter(a=>a.liq>=1000&&a.sig.k==="bull"&&a.sc.ext<=1.5).sort((x,y)=>y.sc.total-x.sc.total||y.sc.vr-x.sc.vr).slice(0,6);
+const topPicks=()=>ALL.filter(a=>!isETF(a)&&a.liq>=1000&&a.sig.k==="bull"&&a.sc.ext<=1.5).sort((x,y)=>y.sc.total-x.sc.total||y.sc.vr-x.sc.vr).slice(0,6);
 function cardHTML(a){const S=a.S,i=a.i;
   return `<article class="card" data-id="${S.id}" tabindex="0">
    <div class="top"><div style="min-width:0"><div class="nm">${S.name}</div><div class="id num">${S.id} · ${S.ind||"—"}</div></div>${starBtn(S.id)}</div>
@@ -662,7 +673,16 @@ function renderWatch(){
    :`<div class="empty">還沒有自選股。在任何股票旁點星號，就會出現在這裡，每天收盤後幫你檢查評分變化與進出場時機。<div class="acts" style="justify-content:center"><button class="btn gold" id="addTop3">一鍵加入今日精選前 3 檔</button></div></div>`;
   const b=$("#addTop3");if(b)b.onclick=()=>{topPicks().slice(0,3).forEach(a=>{if(!isW(a.S.id))WATCH.push(a.S.id)});store.set("lpk-watch",WATCH);renderWatch();toast("已加入 3 檔自選股")};
 }
-function sectors(){const m={};ALL.filter(a=>a.liq>=200&&a.S.ind&&a.S.ind!=="其他").forEach(a=>{const g=m[a.S.ind]||(m[a.S.ind]={n:0,chg:0,sc:0,bull:0});g.n++;g.chg+=a.chg;g.sc+=a.sc.total;if(a.sig.k==="bull")g.bull++});
+function etfHome(){
+  const E=ALL.filter(a=>isETF(a)&&a.liq>=500);if(!E.length)return "";
+  const P=E.filter(a=>!isLev(a)&&a.sig.k==="bull"&&a.sc.ext<=1.5).sort((x,y)=>y.sc.total-x.sc.total||y.liq-x.liq).slice(0,3);
+  const m={};E.forEach(a=>{const k=a.S.ind.replace("ETF·","");const g=m[k]||(m[k]={n:0,chg:0,sc:0,bull:0});g.n++;g.chg+=a.chg;g.sc+=a.sc.total;if(a.sig.k==="bull")g.bull++});
+  const C=Object.entries(m).map(([k,g])=>({k,n:g.n,chg:g.chg/g.n,sc:g.sc/g.n,bull:g.bull})).sort((x,y)=>y.sc-x.sc);
+  return `<div class="sec"><div class="sec-h"><div><h2>ETF 精選</h2><p>日均量 ≥500 張、評分 ≥70 且未過度乖離的 ETF（不含槓桿、反向）${qBtn("ETF")}</p></div><button class="linkbtn" data-go="pick" data-type="etf">看全部 ETF →</button></div>
+   ${P.length?`<div class="cards">${P.map(cardHTML).join("")}</div>`:`<div class="empty" style="border-radius:var(--r)">今天沒有符合條件的 ETF，可到推薦標的切換「ETF」看全部評分。</div>`}
+   <div class="heat" style="margin-top:10px">${C.map(s=>{const t=Math.min(1,Math.abs(s.chg)/0.02),c=s.chg>=0?"up":"down";return `<button data-ind="${esc("ETF·"+s.k)}" style="background:color-mix(in srgb,var(--${c}) ${(6+t*34).toFixed(0)}%,var(--surface))"><div class="hn">${s.k}</div><div class="hv">${s.sc.toFixed(0)} 分 <span class="${c}" style="font-size:12px">${pct(s.chg)}</span></div><div class="hs">${s.n} 檔 · 偏多 ${s.bull}</div></button>`}).join("")}</div></div>`;
+}
+function sectors(){const m={};ALL.filter(a=>!isETF(a)&&a.liq>=200&&a.S.ind&&a.S.ind!=="其他").forEach(a=>{const g=m[a.S.ind]||(m[a.S.ind]={n:0,chg:0,sc:0,bull:0});g.n++;g.chg+=a.chg;g.sc+=a.sc.total;if(a.sig.k==="bull")g.bull++});
   return Object.entries(m).filter(([k,g])=>g.n>=4).map(([k,g])=>({k,n:g.n,chg:g.chg/g.n,sc:g.sc/g.n,bull:g.bull})).sort((x,y)=>y.sc-x.sc)}
 function renderHome(){
   const m=marketHTML(),P=topPicks();
@@ -685,6 +705,8 @@ function renderHome(){
    ${P.length?`<div class="cards">${P.map(cardHTML).join("")}</div>`:`<div class="empty" style="border-radius:var(--r)">今天沒有同時符合條件的股票。行情不明時，空手等待也是一種選擇。</div>`}
    ${ex?`<p class="intro" style="margin-top:8px">價位尺怎麼看：綠色是停損、淺紅色區塊是進場區間、圓點是現價、右邊紅色是兩段停利。${qBtn("ENTRY")}${qBtn("STOP")}${qBtn("TP")}</p>`:""}</div>
 
+  ${etfHome()}
+
   <div class="sec"><div class="sec-h"><div><h2>選股流程</h2><p>每一檔股票都經過同一條流程，以 ${(ex||EXA()).S.name} 為例</p></div></div>
    ${(()=>{const a=ex||EXA();return `<div class="chain">
     <div class="nd"><small>綜合評分</small><b>${a.sc.total}</b></div><span class="ar">→</span>
@@ -704,7 +726,7 @@ function renderHome(){
 }
 
 /* ---------- 推薦清單 ---------- */
-let filt="all",preset="",vmode=store.get("lpk-view","list");
+let filt="all",preset="",ptype="all",vmode=store.get("lpk-view","list");
 const colorOf=t=>t>=70?"var(--up)":t>=50?"var(--gold)":"var(--down)";
 function rowHTML(a){
   const S=a.S,i=a.i;
@@ -722,7 +744,7 @@ let shown=50;
 function renderPick(keep){
   if(!keep)shown=50;
   const q=$("#q").value.trim(),so=$("#sort").value,ind=$("#indSel").value,lq=+$("#liq").value||0;
-  let L=ALL.filter(a=>(filt==="all"||a.sig.k===filt)&&(!preset||PRE[preset](a))&&(!ind||a.S.ind===ind)&&(q||a.liq>=lq)&&(!q||a.S.id.includes(q)||a.S.name.includes(q)));
+  let L=ALL.filter(a=>(ptype==="all"||(ptype==="etf")===isETF(a))&&(filt==="all"||a.sig.k===filt)&&(!preset||PRE[preset](a))&&(!ind||a.S.ind===ind)&&(q||a.liq>=lq)&&(!q||a.S.id.includes(q)||a.S.name.includes(q)));
   const key={score:a=>a.sc.total,delta:a=>delta(a),chg:a=>a.chg,vr:a=>a.sc.vr,rs:a=>a.sc.rs}[so]||(a=>a.sc.total);
   L.sort((x,y)=>key(y)-key(x)||y.sc.total-x.sc.total||y.liq-x.liq);
   $("#pickCount").textContent=`符合條件 ${L.length.toLocaleString()} 檔${q?"（搜尋時不限成交量）":""}，顯示前 ${Math.min(shown,L.length)} 檔`;
@@ -731,9 +753,11 @@ function renderPick(keep){
   $("#more").hidden=L.length<=shown;
 }
 function setFilt(f){filt=f;document.querySelectorAll(".chip[data-f]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.f===f))}
+function setType(t){ptype=t;document.querySelectorAll(".chip[data-t]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.t===t))}
 function setPreset(p){preset=p;document.querySelectorAll(".chip[data-p]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.p===p))}
 document.querySelectorAll(".chip[data-f]").forEach(b=>b.onclick=()=>{setFilt(b.dataset.f);renderPick()});
 document.querySelectorAll(".chip[data-p]").forEach(b=>b.onclick=()=>{setPreset(b.dataset.p);renderPick()});
+document.querySelectorAll(".chip[data-t]").forEach(b=>b.onclick=()=>{setType(b.dataset.t);renderPick()});
 $("#q").oninput=()=>renderPick();$("#sort").onchange=()=>renderPick();$("#indSel").onchange=()=>renderPick();$("#liq").onchange=()=>renderPick();
 $("#more").onclick=()=>{shown+=50;renderPick(true)};
 function setView(m){vmode=m;store.set("lpk-view",m);$("#vmList").setAttribute("aria-pressed",m==="list");$("#vmCard").setAttribute("aria-pressed",m==="card");renderPick(true)}
@@ -774,6 +798,8 @@ function verdictText(a){const sc=a.sc,pl=a.pl,P=sc.parts;
   else if(a.sig.k==="bull")s+=` 可在 <b class="num">${fmtP(pl.eLo)}–${fmtP(pl.eHi)}</b> 分批買，跌破 <b class="num down">${fmtP(pl.stop)}</b> 停損，目標 <b class="num up">${fmtP(pl.tp1)}</b> 與 <b class="num up">${fmtP(pl.tp2)}</b>。`;
   else if(a.sig.k==="watch")s+=pl.brk?` 先觀察，帶量站上 <b class="num">${fmtP(pl.brk)}</b> 再考慮進場。`:" 先觀察，等訊號到齊。";
   else s+=` 暫不進場；已持有者跌破 <b class="num down">${fmtP(pl.stop)}</b> 或月線應減碼。`;
+  if(isLev(a))s+=` <b>提醒：這是${a.S.ind.replace("ETF·","")} ETF，每日重新平衡，長期持有會有耗損，只適合短線操作。</b>`;
+  else if(isETF(a))s+=` 這是 ETF（${a.S.ind.replace("ETF·","")}），一次買進一籃子標的，波動通常比個股小。`;
   const pen=P.find(p=>p.k==="風險扣分");if(pen)s+=` 注意：${pen.why}。`;
   return s}
 function renderQchips(){$("#qchips").innerHTML=`<span>常見搜尋</span>`+POPULAR.slice(0,6).map(id=>`<button class="chip" data-pick="${id}">${BY[id].S.name}</button>`).join("")+(RECENT.length?`<span style="margin-left:6px">最近</span>`+RECENT.slice(0,4).map(id=>`<button class="chip" data-pick="${id}">${BY[id].S.name}</button>`).join(""):"")}
@@ -1017,8 +1043,8 @@ document.addEventListener("click",e=>{
   const g=t.closest("[data-g]");if(g){e.stopPropagation();openTerm(g.dataset.g);return}
   if(t.closest("[data-del]"))return;
   const pk=t.closest("[data-pick]");if(pk){openStock(pk.dataset.pick);return}
-  const gv=t.closest("[data-go]");if(gv){closeSheet();if(gv.dataset.preset){setFilt(gv.dataset.preset);setPreset("")}go(gv.dataset.go);if(gv.dataset.go!=="home")window.scrollTo({top:0});return}
-  const ind=t.closest("[data-ind]");if(ind){$("#indSel").value=ind.dataset.ind;setFilt("all");setPreset("");$("#liq").value="200";go("pick");renderPick();window.scrollTo({top:0});return}
+  const gv=t.closest("[data-go]");if(gv){closeSheet();if(gv.dataset.preset){setFilt(gv.dataset.preset);setPreset("")}if(gv.dataset.type){setType(gv.dataset.type);setFilt("all");setPreset("");$("#indSel").value=""}go(gv.dataset.go);if(gv.dataset.go!=="home")window.scrollTo({top:0});return}
+  const ind=t.closest("[data-ind]");if(ind){$("#indSel").value=ind.dataset.ind;setFilt("all");setPreset("");setType("all");$("#liq").value="200";go("pick");renderPick();window.scrollTo({top:0});return}
   const r=t.closest("[data-id]");if(r&&!t.closest("#ov")){openStock(r.dataset.id)}
 });
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.matches&&e.target.matches("[data-id][tabindex]"))openStock(e.target.dataset.id)});
@@ -1049,7 +1075,7 @@ function applyLive(doc){
       const p=q[0];s.c.push(p);s.o.push(q[1]||p);s.h.push(Math.max(q[2]||p,p));s.l.push(Math.min(q[3]||p,p));s.v.push(q[4]||0)}}
   LIVE_ON=useBar;
   if(useBar){const cid=cur&&cur.S.id;recompute();rebuildBY();WATCH=WATCH.filter(id=>BY[id]);if(cid)cur=BY[cid];
-    $("#cnt").textContent=ALL.length.toLocaleString();$("#v-method").innerHTML="";renderRadar();
+    setCounts();$("#v-method").innerHTML="";renderRadar();
     const v=curView();if(v==="home")renderHome();else if(v==="pick")renderPick(true);else if(v==="port")renderPort();else if(v==="learn")renderLearn();else if(v==="stock"&&cur){const y=scrollY;showStock(cur.S.id);scrollTo({top:y})}}
   renderLiveChip();
 }
@@ -1057,7 +1083,7 @@ setInterval(renderLiveChip,60000);
 async function pollLive(){try{const r=await fetch("data/live.json?t="+Date.now(),{cache:"no-store"});if(r.ok)applyLive(await r.json())}catch(e){}}
 pollLive();setInterval(pollLive,60000);
 /* ---------- 啟動 ---------- */
-$("#asof").textContent=LAST;$("#cnt").textContent=ALL.length.toLocaleString();
+$("#asof").textContent=LAST;setCounts();
 $("#learnBadge").textContent=`${READ.filter(k=>GMAP[k]).length}/${GN}`;$("#portBadge").textContent=PORT.length;
 $("#vmList").setAttribute("aria-pressed",vmode==="list");$("#vmCard").setAttribute("aria-pressed",vmode==="card");
 renderQchips();renderPick();renderRadar();renderLiveChip();
