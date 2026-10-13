@@ -4,7 +4,9 @@ import json, sys, time, datetime, urllib.request
 from concurrent.futures import ThreadPoolExecutor
 TZ = datetime.timezone(datetime.timedelta(hours=8))
 UA = {'User-Agent': 'Mozilla/5.0', 'Referer': 'https://mis.twse.com.tw/stock/index.jsp'}
-ids = list(json.load(open('data/raw.json', encoding='utf8'))['s'])
+S = json.load(open('data/raw.json', encoding='utf8'))['s']
+ids = list(S)
+OTC = {i for i, s in S.items() if s.get('x') == 'o'}  # 上櫃（多為債券 ETF）
 try: old = json.load(open('data/live.json', encoding='utf8'))
 except Exception: old = {}
 r2 = lambda x: None if x is None else round(x, 2)
@@ -17,7 +19,7 @@ def get_json(u, timeout=20):
 
 def from_mis():
     q = {}; ix = None
-    chans = ['tse_%s.tw' % i for i in ids]
+    chans = [('otc_%s.tw' if i in OTC else 'tse_%s.tw') % i for i in ids]
     def batch(ch):
         for _ in range(2):
             try: return get_json('https://mis.twse.com.tw/stock/api/getStockInfo.jsp?json=1&delay=0&ex_ch=' + '|'.join(ch)).get('msgArray', [])
@@ -46,7 +48,7 @@ def yahoo(sym):
         except Exception: time.sleep(1)
 
 def from_yahoo():
-    with ThreadPoolExecutor(24) as ex: res = dict(zip(ids, ex.map(lambda i: yahoo(i + '.TW'), ids)))
+    with ThreadPoolExecutor(24) as ex: res = dict(zip(ids, ex.map(lambda i: yahoo(i + ('.TWO' if i in OTC else '.TW')), ids)))
     return {k: v for k, v in res.items() if v}, yahoo('%5ETWII')
 
 src = 'twse'

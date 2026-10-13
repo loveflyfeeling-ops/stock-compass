@@ -4,6 +4,7 @@ TZ=datetime.timezone(datetime.timedelta(hours=8))
 day=sys.argv[1] if len(sys.argv)>1 else datetime.datetime.now(TZ).strftime('%Y-%m-%d')
 R=json.load(open('data/raw.json',encoding='utf8'))
 D=R['dates']
+SUF=lambda sid:'.TWO' if R['s'][sid].get('x')=='o' else '.TW'
 if day in D: print('ALREADY',day);sys.exit(0)
 if day<D[-1]: print('OLDER',day,'<',D[-1]);sys.exit(0)
 ymd=day.replace('-','')
@@ -30,7 +31,7 @@ if len(bars)<500:
     # 證交所取不到（休市或被擋）：改用 Yahoo 當日 K 線
     def yb(sid):
         try:
-            r=fetch(f'https://query1.finance.yahoo.com/v8/finance/chart/{sid}.TW?interval=1d&range=1d')['chart']['result'][0]
+            r=fetch(f'https://query1.finance.yahoo.com/v8/finance/chart/{sid}{SUF(sid)}?interval=1d&range=1d')['chart']['result'][0]
             m=r['meta'];q=r['indicators']['quote'][0]
             if datetime.datetime.fromtimestamp(m['regularMarketTime'],TZ).strftime('%Y-%m-%d')!=day: return sid,None
             g=lambda k:(q.get(k) or [None])[-1]
@@ -47,7 +48,7 @@ if len(bars)<500:
 # 成交量改用 Yahoo（與歷史資料同一來源，含零股與盤後），取不到才用證交所
 def yv(sid):
     try:
-        r=fetch(f'https://query1.finance.yahoo.com/v8/finance/chart/{sid}.TW?interval=1d&range=1d')['chart']['result'][0]['meta']
+        r=fetch(f'https://query1.finance.yahoo.com/v8/finance/chart/{sid}{SUF(sid)}?interval=1d&range=1d')['chart']['result'][0]['meta']
         if datetime.datetime.fromtimestamp(r['regularMarketTime'],TZ).strftime('%Y-%m-%d')==day and r.get('regularMarketVolume'): return sid,round(r['regularMarketVolume']/1000)
     except Exception: pass
     return sid,None
@@ -55,6 +56,19 @@ with ThreadPoolExecutor(24) as ex: YV=dict(ex.map(yv,list(R['s'])))
 print('yahoo volume',sum(1 for v in YV.values() if v))
 for sid,b in bars.items():
     if YV.get(sid): b[4]=YV[sid]
+# 上櫃標的（證交所行情沒有）改用 Yahoo 當日 K 線
+def ybar(sid):
+    try:
+        r=fetch(f'https://query1.finance.yahoo.com/v8/finance/chart/{sid}{SUF(sid)}?interval=1d&range=1d')['chart']['result'][0]
+        m=r['meta'];q=r['indicators']['quote'][0]
+        if datetime.datetime.fromtimestamp(m['regularMarketTime'],TZ).strftime('%Y-%m-%d')!=day: return sid,None
+        g=lambda k:(q.get(k) or [None])[-1];rr=lambda v:None if v is None else round(v,2)
+        return sid,[rr(g('open')),rr(m.get('regularMarketDayHigh')),rr(m.get('regularMarketDayLow')),rr(m['regularMarketPrice']),round((m.get('regularMarketVolume') or 0)/1000)]
+    except Exception: return sid,None
+need=[sid for sid in R['s'] if sid not in bars]
+with ThreadPoolExecutor(16) as ex:
+    for sid,b in ex.map(ybar,need):
+        if b: bars[sid]=b
 inst={}
 try:
     t86=fetch(f'https://www.twse.com.tw/rwd/zh/fund/T86?date={ymd}&selectType=ALLBUT0999&response=json')
