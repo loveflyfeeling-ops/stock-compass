@@ -298,6 +298,39 @@ nav.tabs button[aria-selected="true"]{background:var(--ink);border-color:var(--i
 .lv{font-size:10.5px;font-weight:700;color:var(--up);border:1px solid currentColor;border-radius:4px;padding:0 4px;margin-left:6px;vertical-align:2px;font-family:var(--f-body)}
 .rt{color:var(--accent);font-size:12px;font-weight:500;text-decoration:none;white-space:nowrap}.rt:hover{text-decoration:underline}
 .hero .rt{color:var(--hero-ink)}
+/* ===== v3：法人籌碼、資金流向、估值 ===== */
+.kv small{display:block;font-size:11.5px;color:var(--muted);font-weight:400}
+.mbars{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px;margin-top:12px}
+.mbar{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px 6px;min-width:0}
+.mbar svg{display:block;width:100%;height:70px}
+.mbar rect{cursor:pointer}
+.mbh,.mbx{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}
+.mbh span:first-child{color:var(--ink);font-weight:500}
+.mbx{font-size:11px;margin-top:2px}
+.itbl td,.itbl th{vertical-align:top}
+.itbl td .id,.itbl td div{font-size:11.5px;color:var(--muted)}
+.itbl td div.up{color:var(--up)}.itbl td div.down{color:var(--down)}
+.itbl tbody tr{cursor:pointer}
+.itbl tbody tr:hover{background:var(--surface2)}
+.flows{display:flex;flex-direction:column;gap:8px}
+.fl{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px}
+.fl summary{list-style:none;cursor:pointer}
+.fl summary::-webkit-details-marker{display:none}
+.fh{display:flex;align-items:baseline;gap:8px}
+.fh b{font-size:15.5px}
+.fh .fchg{margin-left:auto;font-weight:600;font-size:15px}
+.sharebar{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin:6px 0}
+.sharebar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.fm{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:12.5px;color:var(--muted)}
+.fm b{color:var(--ink);font-weight:500}
+.fm b.up{color:var(--up)}.fm b.down{color:var(--down)}
+.fx{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:4px 16px;margin-top:8px}
+.fx .sub,.panel .sub{font-size:12px;color:var(--muted);margin:4px 0}
+.mv{font:inherit;display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;padding:6px 2px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);cursor:pointer;font-size:13.5px}
+.mv:hover{background:var(--surface2)}
+.mv .id{font-size:12px;color:var(--muted)}
+.vals{font-size:12.5px;color:var(--muted)}.vals b{color:var(--ink);font-weight:500}
+nav.tabs button.t-inst{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 35%,transparent);color:var(--accent)}
 </style>
 </head><body>
 <div class="wrap">
@@ -306,7 +339,7 @@ nav.tabs button[aria-selected="true"]{background:var(--ink);border-color:var(--i
       <h1>量價羅盤</h1>
       <p>台股智能選股：評分、進場區間、停利與停損，一次看清楚</p>
     </div>
-    <div class="stamp"><span id="liveChip" class="live off"><i></i><span>收盤快照</span></span><br>資料截至 <b class="num" id="asof"></b> <span id="asofTag">收盤</span><br>來源 證交所＋Yahoo Finance · 股票 <span id="cnt"></span> 檔 · ETF <span id="cntE"></span> 檔</div>
+    <div class="stamp"><span id="liveChip" class="live off"><i></i><span>收盤快照</span></span><br>資料截至 <b class="num" id="asof"></b> <span id="asofTag">收盤</span><br>來源 證交所＋櫃買中心＋Yahoo Finance · 股票 <span id="cnt"></span> 檔 · ETF <span id="cntE"></span> 檔</div>
   </header>
 
   <div class="topbar">
@@ -314,6 +347,8 @@ nav.tabs button[aria-selected="true"]{background:var(--ink);border-color:var(--i
     <button role="tab" aria-selected="true" data-v="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>總覽</button>
     <button role="tab" aria-selected="false" data-v="pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>推薦標的</button>
     <button role="tab" aria-selected="false" data-v="radar" class="t-radar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12l6-6"/></svg>爆發雷達</button>
+    <button role="tab" aria-selected="false" data-v="inst" class="t-inst"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 10h16M12 3l8 5H4z"/><path d="M6 10v8M10 10v8M14 10v8M18 10v8"/></svg>法人籌碼</button>
+    <button role="tab" aria-selected="false" data-v="flow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>資金流向</button>
     <button role="tab" aria-selected="false" data-v="stock" class="t-stock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>個股分析</button>
     <button role="tab" aria-selected="false" data-v="port"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/></svg>持股健診 <span class="badge" id="portBadge">0</span></button>
     <button role="tab" aria-selected="false" data-v="learn" class="t-learn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>名詞小學堂 <span class="badge" id="learnBadge">0/0</span></button>
@@ -324,7 +359,7 @@ nav.tabs button[aria-selected="true"]{background:var(--ink);border-color:var(--i
   <section class="view" id="v-home"><p class="intro" style="padding-block:40px;text-align:center">載入資料中…</p></section>
 
   <section class="view" id="v-pick" hidden>
-    <p class="intro">依趨勢、動能、量能、相對強弱與法人籌碼五項打分（滿分 100）。70 分以上為「偏多布局」，點任一檔看完整進出場計畫，點星號加入自選。</p>
+    <p class="intro">依趨勢、動能、量能、相對強弱與法人籌碼五項打分（滿分 100），並附上本益比、殖利率與外資動向。70 分以上為「偏多布局」，點任一檔看完整進出場計畫，點星號加入自選。</p>
     <div class="presets" id="presets">
       <span class="lab">類型</span>
       <button class="chip" aria-pressed="true" data-t="all">全部</button>
@@ -339,6 +374,10 @@ nav.tabs button[aria-selected="true"]{background:var(--ink);border-color:var(--i
       <button class="chip" aria-pressed="false" data-p="strong">強於大盤 5%</button>
       <button class="chip" aria-pressed="false" data-p="inst">法人買超</button>
       <button class="chip" aria-pressed="false" data-p="pull">拉回到進場區</button>
+      <button class="chip" aria-pressed="false" data-p="fbuy">外資連買 3 日</button>
+      <button class="chip" aria-pressed="false" data-p="tbuy">投信連買 3 日</button>
+      <button class="chip" aria-pressed="false" data-p="lowpe">本益比 &lt; 15</button>
+      <button class="chip" aria-pressed="false" data-p="hidy">殖利率 ≥ 5%</button>
     </div>
     <div class="controls">
       <button class="chip" aria-pressed="true" data-f="all">全部</button>
@@ -352,6 +391,10 @@ nav.tabs button[aria-selected="true"]{background:var(--ink);border-color:var(--i
         <option value="chg">依今日漲跌</option>
         <option value="vr">依量比</option>
         <option value="rs">依 20 日強弱</option>
+        <option value="fi">依外資買超金額</option>
+        <option value="it">依投信買超金額</option>
+        <option value="dy">依殖利率</option>
+        <option value="pe">依本益比（低到高）</option>
       </select>
       <select id="indSel" aria-label="產業"><option value="">全部產業</option></select>
       <select id="liq" aria-label="流動性">
@@ -372,6 +415,9 @@ nav.tabs button[aria-selected="true"]{background:var(--ink);border-color:var(--i
     <p class="intro num" id="radarCount"></p>
     <div class="list" id="radarList"></div>
   </section>
+
+  <section class="view" id="v-inst" hidden></section>
+  <section class="view" id="v-flow" hidden></section>
 
   <section class="view" id="v-stock" hidden>
     <div class="picker"><input id="pickIn" list="pickList2" placeholder="輸入代號或名稱，例如 2330 或 台積電" aria-label="選擇股票" style="flex:1;font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-width:0"><datalist id="pickList2"></datalist><button class="btn pri" id="pickGo">查詢</button></div>
@@ -406,6 +452,7 @@ function rt(p,mode){const t=tick(p);const f=mode==="up"?Math.ceil:mode==="down"?
 function sma(a,n){const o=[];let s=0;for(let i=0;i<a.length;i++){s+=a[i];if(i>=n)s-=a[i-n];o.push(i>=n-1?s/n:null)}return o}
 function ema(a,n){const k=2/(n+1);const o=[];let m=null;for(const x of a){m=m==null?x:x*k+m*(1-k);o.push(m)}return o}
 function wild(a,n){const o=[];let m=null,c=0;for(const x of a){if(x==null){o.push(null);continue}c++;m=m==null?x:(m*(n-1)+x)/n;o.push(c>=n?m:null)}return o}
+if(RAW.enc){for(const id in RAW.s){const s=RAW.s[id];for(const k of["o","h","l"])s[k]=s[k].map((d,i)=>Math.round(s.c[i]*100+d)/100)}}
 const D=RAW.dates,FK=RAW.fk;
 function build(id){
   const s=RAW.s[id];const k=s.k;const n=s.c.length;
@@ -422,7 +469,7 @@ function build(id){
   const ret20=c.map((x,i)=>i<20?null:x/c[i-20]-1);
   const fv=gi=>gi>=FK&&s.f[gi-FK]!=null?s.f[gi-FK]:null;
   const f5=d.map((x,i)=>{let t=0,has=false;for(let j=Math.max(0,i-4);j<=i;j++){const y=fv(k+j);if(y!=null){t+=y;has=true}}return has?t:null});
-  return {id,name:s.n,ind:s.i,k,n,d,o,h,l,c,v,ma5,ma20,ma60,vma20,rsi,macd,sig,hist,atr,bw,hi20,ret20,f5};
+  return {id,name:s.n,ind:s.i,pe:s.pe,pb:s.pb,dy:s.dy,k,n,d,o,h,l,c,v,ma5,ma20,ma60,vma20,rsi,macd,sig,hist,atr,bw,hi20,ret20,f5};
 }
 
 function score(S,i,B){
@@ -497,6 +544,121 @@ function backtest(S,B){
   return {tr,closed,wins,avg,comp,hold:S.c[S.n-1]/S.c[60]-1};
 }
 
+/* ---------- 籌碼（外資、投信）與估值 ---------- */
+const fz=n=>n==null?"—":(n>0?"+":"")+Math.round(n).toLocaleString();
+const fy=x=>(x>0?"+":"")+(x/1e8).toFixed(Math.abs(x)>=1e10?0:1)+" 億";
+const stk=s=>s>=2?`連買 ${s} 日`:s===1?"買 1 日":s<=-2?`連賣 ${-s} 日`:s===-1?"賣 1 日":"—";
+function chipOf(S){const s=RAW.s[S.id];if(!s||!s.ff||!s.ff.length)return null;
+  let g=Math.min(S.k+S.n-1,FK+s.ff.length-1);
+  while(g>=FK&&s.ff[g-FK]==null&&s.ft[g-FK]==null)g--;if(g<FK)return null;
+  const sum=(a,n)=>{let t=0;for(let j=g;j>g-n&&j>=FK;j--)t+=a[j-FK]||0;return t};
+  const streak=a=>{const v0=a[g-FK]||0;if(!v0)return 0;const sg=Math.sign(v0);let n=0;for(let j=g;j>=FK;j--){const x=a[j-FK];if(x&&Math.sign(x)===sg)n++;else break}return sg*n};
+  const li=g-S.k,vol=S.v[li]||0,px=S.c[li]||0,fi=s.ff[g-FK]||0,it=s.ft[g-FK]||0;
+  return {g,d:D[g],fi,it,px,fiA:fi*px*1000,itA:it*px*1000,fi5:sum(s.ff,5),it5:sum(s.ft,5),fi20:sum(s.ff,20),it20:sum(s.ft,20),fs:streak(s.ff),ts:streak(s.ft),pct:vol?(fi+it)/vol:0}}
+function chipLast(){let g=-1;for(const id in RAW.s){const s=RAW.s[id];if(!s.ff)continue;for(let j=s.ff.length-1;j>=0;j--){if(s.ff[j]!=null){g=Math.max(g,FK+j);break}}}return g}
+const valTxt=S=>[S.pe?`PE <b>${S.pe.toFixed(1)}</b>`:"",S.dy?`殖利率 <b>${S.dy.toFixed(1)}%</b>`:""].filter(Boolean).join(" ");
+/* 正負長條（買超紅、賣超綠），點長條顯示數值 */
+function divBars(vals,lab,unit,fmt){
+  const n=vals.length;if(!n)return "";const mx=Math.max(1e-9,...vals.map(v=>Math.abs(v[1]||0)));const W=300,H=70,mid=H/2,bw=W/Math.max(n,10);
+  return `<div class="mbar"><div class="mbh"><span>${lab} · 近 ${n} 日</span><span class="num">最大 ${fmt(mx).replace("+","")}${unit}</span></div>
+  <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${lab}近 ${n} 日買賣超"><line x1="0" x2="${W}" y1="${mid}" y2="${mid}" stroke="var(--line)" vector-effect="non-scaling-stroke"/>
+  ${vals.map(([d,v],k)=>{v=v||0;const h=Math.max(Math.abs(v)/mx*(mid-3),0.6);const tip=`${d} ${lab} ${fmt(v)}${unit}`;return `<rect data-tip="${tip}" x="${(k*bw+1.5).toFixed(1)}" width="${(bw-3).toFixed(1)}" y="${(v>=0?mid-h:mid).toFixed(1)}" height="${h.toFixed(1)}" fill="var(--${v>=0?"up":"down"})"><title>${tip}</title></rect>`}).join("")}</svg>
+  <div class="mbx num"><span>${vals[0][0].slice(5)}</span><span>點長條看數字</span><span>${vals[n-1][0].slice(5)}</span></div></div>`}
+function stockBars(a){const s=RAW.s[a.S.id],c=a.ch;if(!c)return "";const st=Math.max(FK,c.g-19),F=[],T=[];
+  for(let j=st;j<=c.g;j++){F.push([D[j],s.ff[j-FK]]);T.push([D[j],s.ft[j-FK]])}
+  return `<div class="mbars">${divBars(F,"外資"," 張",fz)}${divBars(T,"投信"," 張",fz)}</div>`}
+function chipPanel(a){const S=a.S,c=a.ch;
+  return `<div class="panel"><h3>籌碼與估值 ${qBtn("FI")}</h3><div class="kv num">
+    <div><span>本益比${qBtn("PE")}</span><b>${S.pe?S.pe.toFixed(1):"—"}</b></div>
+    <div><span>股價淨值比${qBtn("PB")}</span><b>${S.pb?S.pb.toFixed(2):"—"}</b></div>
+    <div><span>殖利率${qBtn("DY")}</span><b>${S.dy?S.dy.toFixed(2)+"%":"—"}</b></div>
+    ${c?`<div><span>外資 ${c.d.slice(5)}</span><b class="${cls(c.fi)}">${fz(c.fi)} 張</b><small>${stk(c.fs)}</small></div>
+    <div><span>投信 ${c.d.slice(5)}</span><b class="${cls(c.it)}">${fz(c.it)} 張</b><small>${stk(c.ts)}</small></div>
+    <div><span>外資＋投信佔量${qBtn("ACC")}</span><b class="${cls(c.pct)}">${(c.pct*100).toFixed(1)}%</b></div>
+    <div><span>外資 20 日累計</span><b class="${cls(c.fi20)}">${fz(c.fi20)} 張</b></div>
+    <div><span>投信 20 日累計</span><b class="${cls(c.it20)}">${fz(c.it20)} 張</b></div>`:`<div><span>法人</span><b>無資料</b></div>`}
+  </div>${stockBars(a)}${!S.pe&&!isETF(a)?`<p class="intro" style="margin:8px 0 0">本益比空白：近四季虧損或交易所未公布。</p>`:""}${isETF(a)?`<p class="intro" style="margin:8px 0 0">ETF 沒有本益比與淨值比；殖利率依交易所公布。</p>`:""}</div>`}
+
+/* ---------- 法人籌碼分頁 ---------- */
+let instMode="fbuy";
+const IM={
+  fbuy:{t:"外資買超",f:a=>a.ch.fi>0,k:a=>a.ch.fiA},
+  fsell:{t:"外資賣超",f:a=>a.ch.fi<0,k:a=>-a.ch.fiA},
+  tbuy:{t:"投信買超",f:a=>a.ch.it>0,k:a=>a.ch.itA},
+  tsell:{t:"投信賣超",f:a=>a.ch.it<0,k:a=>-a.ch.itA},
+  fstr:{t:"外資連買",f:a=>a.ch.fs>=3,k:a=>a.ch.fs*1e12+a.ch.fiA},
+  tstr:{t:"投信連買",f:a=>a.ch.ts>=3,k:a=>a.ch.ts*1e12+a.ch.itA},
+  acc:{t:"吸籌偵測",f:a=>a.liq>=200&&a.ch.fi>0&&a.ch.it>0&&a.ch.pct>0.1,k:a=>a.ch.pct},
+  dist:{t:"出貨偵測",f:a=>a.liq>=200&&a.ch.fi<0&&a.ch.it<0&&a.ch.pct<-0.1,k:a=>-a.ch.pct}};
+function instRow(a){const c=a.ch,S=a.S;return `<tr data-id="${S.id}" tabindex="0" role="button">
+  <td><b>${S.name}</b> <span class="id">${S.id}</span><div class="id">${(S.ind||"").replace("ETF·","ETF ")}</div></td>
+  <td><b class="${cls(a.chg)}">${fmtP(S.c[a.i])}</b><div class="${cls(a.chg)}">${pct(a.chg)}</div></td>
+  <td><b class="${cls(c.fi)}">${fz(c.fi)}</b><div class="id">${fy(c.fiA)} · ${stk(c.fs)}</div></td>
+  <td><b class="${cls(c.it)}">${fz(c.it)}</b><div class="id">${fy(c.itA)} · ${stk(c.ts)}</div></td>
+  <td class="${cls(c.pct)}">${(c.pct*100).toFixed(1)}%</td>
+  <td><span class="pill ${a.sig.c}">${a.sc.total}</span></td></tr>`}
+function mktChips(){const g=chipLast();if(g<FK)return null;const st=Math.max(FK,g-19),F=[],T=[];
+  for(let j=st;j<=g;j++){let f=0,t=0;for(const id in RAW.s){const s=RAW.s[id],x=s.ff[j-FK],y=s.ft[j-FK];if(x==null&&y==null)continue;const li=j-s.k;const p=s.c[li];if(!(p>0))continue;f+=(x||0)*p*1000;t+=(y||0)*p*1000}F.push([D[j],f]);T.push([D[j],t])}
+  return {g,F,T}}
+function renderInst(){
+  const M=mktChips(),L=ALL.filter(a=>a.ch&&M&&a.ch.g===M.g);
+  if(!M||!L.length){$("#v-inst").innerHTML=`<div class="empty">目前沒有法人資料。</div>`;return}
+  const n=M.F.length-1,acc=L.filter(IM.acc.f).length,dist=L.filter(IM.dist.f).length;
+  const sumA=(arr)=>arr.reduce((s,x)=>s+x[1],0);
+  const m=IM[instMode],R=L.filter(m.f).sort((x,y)=>m.k(y)-m.k(x)).slice(0,30);
+  $("#v-inst").innerHTML=`<div class="sec-h"><div><h2>法人籌碼</h2><p>資料日 ${D[M.g]} · 上市＋上櫃 · 外資（含外資自營商）與投信每日買賣超 ${qBtn("FI")}${qBtn("IT")}</p></div></div>
+  <div class="kpis">
+    <div class="kpi"><span>外資今日（估算金額）</span><b class="${cls(M.F[n][1])}">${fy(M.F[n][1])}</b><small>20 日累計 ${fy(sumA(M.F))}</small></div>
+    <div class="kpi"><span>投信今日（估算金額）</span><b class="${cls(M.T[n][1])}">${fy(M.T[n][1])}</b><small>20 日累計 ${fy(sumA(M.T))}</small></div>
+    <div class="kpi"><span>吸籌偵測 ${qBtn("ACC")}</span><b class="up">${acc} 檔</b><small>外資投信同買、佔量 ≥10%</small></div>
+    <div class="kpi"><span>出貨偵測</span><b class="down">${dist} 檔</b><small>外資投信同賣、佔量 ≥10%</small></div></div>
+  <div class="mbars sec">${divBars(M.F,"外資（全市場）"," ",fy)}${divBars(M.T,"投信（全市場）"," ",fy)}</div>
+  <p class="intro" style="margin-top:6px">金額＝買賣超張數 × 收盤價估算，用來比較不同價位股票的資金規模；紅色為買超、綠色為賣超。</p>
+  <div class="presets sec" id="instModes"><span class="lab">排行</span>${Object.entries(IM).map(([k,v])=>`<button class="chip" aria-pressed="${k===instMode}" data-im="${k}">${v.t}</button>`).join("")}</div>
+  <p class="intro num">${m.t}：${L.filter(m.f).length} 檔，${instMode==="acc"||instMode==="dist"?"依法人佔成交量排序":instMode==="fstr"||instMode==="tstr"?"依連續天數排序":"依估算金額排序"}，顯示前 ${R.length} 檔；點任一列看個股</p>
+  ${R.length?`<div class="tablewrap panel" style="padding:4px 6px"><table class="itbl num"><thead><tr><th>股票</th><th>收盤</th><th>外資（張）</th><th>投信（張）</th><th>佔量</th><th>評分</th></tr></thead><tbody>${R.map(instRow).join("")}</tbody></table></div>`:`<div class="empty" style="border-radius:var(--r)">今天沒有符合「${m.t}」的股票。</div>`}`;
+  $("#v-inst").querySelectorAll("[data-im]").forEach(b=>b.onclick=()=>{instMode=b.dataset.im;renderInst()});
+}
+
+/* ---------- 資金流向分頁 ---------- */
+let flowSort="tv",flowType="stock";
+function flowData(type){const m={};
+  ALL.filter(a=>type==="etf"?isETF(a):!isETF(a)).forEach(a=>{const S=a.S,i=a.i,k=(S.ind||"其他").replace("ETF·","");
+    const g=m[k]||(m[k]={k,n:0,tv:0,tv20:0,chg:0,r20:0,n20:0,r60:0,n60:0,up:0,dn:0,fi:0,it:0,L:[]});
+    const tv=S.c[i]*S.v[i]*1000;let t20=0,c20=0;for(let j=Math.max(0,i-19);j<=i;j++){t20+=S.c[j]*S.v[j]*1000;c20++}
+    g.n++;g.tv+=tv;g.tv20+=t20/c20;g.chg+=a.chg;if(a.chg>0)g.up++;else if(a.chg<0)g.dn++;
+    if(S.ret20[i]!=null){g.r20+=S.ret20[i];g.n20++}if(i>=60){g.r60+=S.c[i]/S.c[i-60]-1;g.n60++}
+    if(a.ch&&a.ch.g===S.k+i){g.fi+=a.ch.fiA;g.it+=a.ch.itA}g.L.push(a)});
+  const G=Object.values(m).filter(g=>g.n>=3),TV=G.reduce((s,g)=>s+g.tv,0)||1;
+  G.forEach(g=>{g.chg/=g.n;g.r20=g.n20?g.r20/g.n20:null;g.r60=g.n60?g.r60/g.n60:null;g.ratio=g.tv20?g.tv/g.tv20:0;g.share=g.tv/TV});
+  return G}
+function renderFlow(){
+  const G=flowData(flowType),key={tv:g=>g.tv,ratio:g=>g.ratio,chg:g=>g.chg,r20:g=>g.r20??-9,fi:g=>g.fi+g.it}[flowSort];
+  G.sort((x,y)=>key(y)-key(x));const mxs=Math.max(...G.map(g=>g.share));
+  const hot=G.filter(g=>g.ratio>=1.2&&g.chg>0).sort((x,y)=>y.ratio-x.ratio).slice(0,3),cold=G.filter(g=>g.ratio>=1.2&&g.chg<0).sort((x,y)=>y.ratio-x.ratio).slice(0,3);
+  const lv=t=>`<span class="${cls(t)}">${t==null?"—":pct(t)}</span>`;
+  const mv=a=>`<button class="mv" data-pick="${a.S.id}"><span>${a.S.name} <span class="id num">${a.S.id}</span></span><span class="num ${cls(a.chg)}">${pct(a.chg)}</span></button>`;
+  $("#v-flow").innerHTML=`<div class="sec-h"><div><h2>資金流向</h2><p>${LAST} · 各產業成交金額、量能放大倍數、漲跌與法人動向 ${qBtn("FLOW")}</p></div></div>
+  <div class="radar-note"><b>今日資金重點：</b>${hot.length?`資金放量流入 ${hot.map(g=>`<b>${g.k}</b>（量 ${g.ratio.toFixed(1)} 倍、${pct(g.chg)}）`).join("、")}`:"沒有產業同時出現量增 1.2 倍以上與上漲"}${cold.length?`；放量下跌的是 ${cold.map(g=>`<b>${g.k}</b>（${pct(g.chg)}）`).join("、")}，留意資金撤出`:""}。</div>
+  <div class="controls">
+    <button class="chip" data-ft="stock" aria-pressed="${flowType==="stock"}">股票產業</button><button class="chip" data-ft="etf" aria-pressed="${flowType==="etf"}">ETF 類別</button>
+    <select id="flowSort" aria-label="排序"><option value="tv">依成交金額</option><option value="ratio">依量能放大倍數</option><option value="chg">依今日漲跌</option><option value="r20">依 20 日漲幅</option><option value="fi">依法人買超金額</option></select></div>
+  <div class="flows">${G.map(g=>{const S=g.L.slice().sort((x,y)=>y.chg-x.chg);return `<details class="fl">
+    <summary><div class="fh"><b>${g.k}</b><span class="id">${g.n} 檔</span><span class="num fchg ${cls(g.chg)}">${pct(g.chg)}</span></div>
+      <div class="sharebar" aria-hidden="true"><i style="width:${(g.share/mxs*100).toFixed(1)}%"></i></div>
+      <div class="fm num"><span>成交 <b>${(g.tv/1e8).toLocaleString("zh-TW",{maximumFractionDigits:0})} 億</b>（${(g.share*100).toFixed(1)}%）</span><span>量能 <b class="${g.ratio>=1.2?"up":g.ratio<0.8?"down":""}">${g.ratio.toFixed(2)} 倍</b></span><span>20 日 ${lv(g.r20)}</span><span>60 日 ${lv(g.r60)}</span><span><span class="up">${g.up}↑</span> <span class="down">${g.dn}↓</span></span><span>外資 <b class="${cls(g.fi)}">${fy(g.fi)}</b></span><span>投信 <b class="${cls(g.it)}">${fy(g.it)}</b></span></div></summary>
+    <div class="fx"><div><div class="sub">強勢</div>${S.slice(0,5).map(mv).join("")}</div><div><div class="sub">弱勢</div>${S.slice(-5).reverse().map(mv).join("")}</div></div>
+    <div class="acts"><button class="btn" data-ind="${esc(flowType==="etf"?"ETF·"+g.k:g.k)}">在推薦標的篩選「${g.k}」</button></div></details>`}).join("")}</div>
+  <p class="intro" style="margin-top:8px">成交金額＝收盤價 × 成交張數 × 1,000 股；量能放大倍數＝今日成交金額 ÷ 近 20 日平均。漲跌為產業內各股平均。點產業展開看最強與最弱的 5 檔。</p>`;
+  $("#flowSort").value=flowSort;$("#flowSort").onchange=e=>{flowSort=e.target.value;renderFlow()};
+  $("#v-flow").querySelectorAll("[data-ft]").forEach(b=>b.onclick=()=>{flowType=b.dataset.ft;renderFlow()});
+}
+function homeInst(){const M=mktChips();if(!M)return "";const L=ALL.filter(a=>a.ch&&a.ch.g===M.g),n=M.F.length-1;
+  const top=(k)=>L.filter(a=>a.ch[k]>0).sort((x,y)=>y.ch[k]-x.ch[k]).slice(0,5);
+  const li=(a,k)=>`<button class="mv" data-pick="${a.S.id}"><span>${a.S.name} <span class="id num">${a.S.id}</span></span><span class="num up">${fy(a.ch[k])}</span></button>`;
+  return `<div class="sec"><div class="sec-h"><div><h2>法人動向</h2><p>${D[M.g]} · 外資 <b class="${cls(M.F[n][1])}">${fy(M.F[n][1])}</b>、投信 <b class="${cls(M.T[n][1])}">${fy(M.T[n][1])}</b>（估算金額）</p></div><button class="linkbtn" data-go="inst">看法人排行 →</button></div>
+   <div class="grid2" style="margin-top:0"><div class="panel"><h3>外資買超前 5</h3>${top("fiA").map(a=>li(a,"fiA")).join("")}</div><div class="panel"><h3>投信買超前 5</h3>${top("itA").map(a=>li(a,"itA")).join("")}</div></div></div>`}
+
 /* ---------- 建立全體資料 ---------- */
 let B,ALL,TX,LAST;
 const IDS=Object.keys(RAW.s);
@@ -504,7 +666,7 @@ function recompute(){
 B=build(BENCH);
 ALL=IDS.map(id=>{
   const S=build(id);const i=S.n-1;const sc=score(S,i,B);if(!sc)return null;const pl=plan(S,i,sc);
-  const sp=score(S,i-1,B);return {S,i,sc,pl,sig:sigOf(sc.total),chg:S.c[i]/S.c[i-1]-1,liq:S.vma20[i]||0,prev:sp?sp.total:null};
+  const sp=score(S,i-1,B);return {S,i,sc,pl,sig:sigOf(sc.total),chg:S.c[i]/S.c[i-1]-1,liq:S.vma20[i]||0,prev:sp?sp.total:null,ch:chipOf(S)};
 }).filter(Boolean);
 TX=RAW.taiex;
 LAST=B.d[B.n-1];
@@ -584,6 +746,14 @@ const GL=[
   ["INST","三大法人買賣超","外資、投信、自營商買進減賣出的張數。本工具看最近 5 日合計，買超佔均量 10% 以上給滿分。法人資金大、研究深，連續買超常是中期行情的推手。",a=>`${a.S.name}法人 5 日 ${a.S.f5[a.i]==null?"無資料":(a.S.f5[a.i]>0?"+":"")+a.S.f5[a.i].toLocaleString()+" 張"}。`],
   ["SQZ","波動收斂","布林通道寬度縮到近半年最窄的四分之一。股價橫盤、量縮，代表多空暫時平衡，之後常出現一段方向明確的大波動。",null],
   ["BRK","突破買點","前 20 日最高價再加一個升降單位。收盤站上且量比大於 1.5 才算有效突破，沒有量的突破容易是假突破。",a=>`${a.S.name}的突破買點是 ${fmtP(a.pl.brk)}。`]]],
+ ["籌碼與估值",[
+  ["FI","外資","外國機構投資人（含外資自營商）。資金最大，常左右權值股方向。看單日買賣超之外，更要看連續買超天數與 20 日累計，連續且持續放大才代表真的在布局。",a=>a.ch?`${a.S.name} ${a.ch.d} 外資 ${fz(a.ch.fi)} 張（${stk(a.ch.fs)}），20 日累計 ${fz(a.ch.fi20)} 張。`:`${a.S.name}目前沒有法人資料。`],
+  ["IT","投信","國內基金公司。資金規模比外資小，但選股集中、常連續布局中小型股，季底作帳前後動作明顯。投信連買常是中期行情的前兆。",a=>a.ch?`${a.S.name} ${a.ch.d} 投信 ${fz(a.ch.it)} 張（${stk(a.ch.ts)}），20 日累計 ${fz(a.ch.it20)} 張。`:`${a.S.name}目前沒有法人資料。`],
+  ["ACC","吸籌與出貨","外資與投信同一天同向買超（吸籌）或賣超（出貨），而且兩者合計佔當日成交量 10% 以上，代表大資金明顯進出。單日訊號仍可能反轉，要配合價格趨勢一起看。",a=>a.ch?`${a.S.name}外資＋投信佔當日成交量 ${(a.ch.pct*100).toFixed(1)}%。`:null],
+  ["PE","本益比","股價 ÷ 近四季每股盈餘（EPS），意思是用公司現在的獲利幾年可以回本。要和同產業比才有意義，成長快的公司本益比通常較高；虧損公司沒有本益比。",a=>a.S.pe?`${a.S.name}本益比 ${a.S.pe.toFixed(1)} 倍。`:`${a.S.name}目前沒有本益比（虧損或無資料）。`],
+  ["PB","股價淨值比","股價 ÷ 每股淨值（公司資產扣掉負債）。低於 1 代表股價比帳面價值便宜，常見於景氣循環股與金融股；但也可能是公司獲利差、市場不看好。",a=>a.S.pb?`${a.S.name}股價淨值比 ${a.S.pb.toFixed(2)}。`:null],
+  ["DY","殖利率","最近一年現金股利 ÷ 股價。5% 以上常被視為高殖利率，但要確認獲利能不能撐住配息，股價跌掉的價差可能比股利還多。",a=>a.S.dy?`${a.S.name}殖利率 ${a.S.dy.toFixed(2)}%。`:null],
+  ["FLOW","資金流向","比較各產業今天的成交金額佔全市場多少、比近 20 日平均放大幾倍。成交放大又上漲，代表資金正在流入；放量下跌則是資金撤出。",null]]],
  ["風險控管",[
   ["ATR","ATR 平均真實波幅","一檔股票平常一天大約會波動多少元（14 日平均）。停損、停利都用 ATR 來算，波動大的股票停損放寬、波動小的就收緊，比固定 7% 停損更合理。",a=>`${a.S.name} ATR14 = ${fmtP(a.S.atr[a.i])} 元，約股價的 ${(a.S.atr[a.i]/a.S.c[a.i]*100).toFixed(1)}%。`],
   ["ENTRY","進場區間","下緣取「月線」與「收盤 − 1 ATR」較高者，上緣為收盤價。在這個區間內分批掛單，等回檔買，不追高。",a=>`${a.S.name}進場區間 ${fmtP(a.pl.eLo)}–${fmtP(a.pl.eHi)}。`],
@@ -659,6 +829,7 @@ function cardHTML(a){const S=a.S,i=a.i;
    <div class="top"><div style="min-width:0"><div class="nm">${S.name}</div><div class="id num">${S.id} · ${S.ind||"—"}</div></div>${starBtn(S.id)}</div>
    <div class="pr num"><span><b class="${cls(a.chg)}">${fmtP(S.c[i])}</b> <span class="${cls(a.chg)}">${pct(a.chg)}</span></span><span class="pill ${a.sig.c}">${a.sig.t} ${a.sc.total}</span></div>
    ${planLadder(a)}
+   ${valTxt(S)||a.ch?`<div class="vals num">${valTxt(S)}${a.ch?` 外資 <b class="${cls(a.ch.fi)}">${fz(a.ch.fi)}</b> 張 ${a.ch.fs>=2||a.ch.fs<=-2?`<small>${stk(a.ch.fs)}</small>`:""}`:""}</div>`:""}
    <div class="tm">${a.pl.tm}</div></article>`}
 function renderWatch(){
   const el=$("#watchBox");if(!el)return;
@@ -716,7 +887,9 @@ function renderHome(){
     <div class="nd"><small>停利一 / 二</small><b class="up">${fmtP(a.pl.tp1)} / ${fmtP(a.pl.tp2)}</b></div><span class="ar">→</span>
     <div class="nd"><small>移動停利</small><b>${fmtP(a.pl.trail)}</b></div></div>`})()}</div>
 
-  <div class="sec"><div class="sec-h"><div><h2>產業強弱地圖</h2><p>依產業平均評分排序，顏色深淺代表今日平均漲跌；點產業直接篩選</p></div></div>
+  ${homeInst()}
+
+  <div class="sec"><div class="sec-h"><div><h2>產業強弱地圖</h2><p>依產業平均評分排序，顏色深淺代表今日平均漲跌；點產業直接篩選</p></div><button class="linkbtn" data-go="flow">看資金流向 →</button></div>
    <div class="heat">${sectors().map(s=>{const t=Math.min(1,Math.abs(s.chg)/0.03),c=s.chg>=0?"up":"down";return `<button data-ind="${esc(s.k)}" style="background:color-mix(in srgb,var(--${c}) ${(6+t*34).toFixed(0)}%,var(--surface))"><div class="hn">${s.k}</div><div class="hv">${s.sc.toFixed(0)} 分 <span class="${c}" style="font-size:12px">${pct(s.chg)}</span></div><div class="hs">${s.n} 檔 · 偏多 ${s.bull}</div></button>`}).join("")}</div></div>
 
   <div class="sec"><div class="sec-h"><div><h2>爆發雷達前 4 名</h2><p>同時符合 4 項以上蓄勢條件 ${qBtn("SQZ")}</p></div><button class="linkbtn" data-go="radar">看完整雷達 →</button></div>
@@ -735,17 +908,17 @@ function rowHTML(a){
     <div class="px num"><b class="${cls(a.chg)}">${fmtP(S.c[i])}</b><span class="${cls(a.chg)}">${pct(a.chg)}</span></div>
     <div class="scorebar"><div class="bar"><i style="width:${a.sc.total}%;background:${colorOf(a.sc.total)}"></i></div><span class="s num">${a.sc.total}</span></div>
     <span class="pill ${a.sig.c}">${a.sig.t}</span>
-    <div class="mini num">進場 <b>${fmtP(a.pl.eLo)}–${fmtP(a.pl.eHi)}</b> 停損 <b class="down">${fmtP(a.pl.stop)}</b> 停利 <b class="up">${fmtP(a.pl.tp1)} / ${fmtP(a.pl.tp2)}</b> 量比 <b>${a.sc.vr.toFixed(2)}</b> 評分 ${dTxt(a)}</div>
+    <div class="mini num">進場 <b>${fmtP(a.pl.eLo)}–${fmtP(a.pl.eHi)}</b> 停損 <b class="down">${fmtP(a.pl.stop)}</b> 停利 <b class="up">${fmtP(a.pl.tp1)} / ${fmtP(a.pl.tp2)}</b> 量比 <b>${a.sc.vr.toFixed(2)}</b> 評分 ${dTxt(a)}${valTxt(S)?" "+valTxt(S):""}${a.ch?` 外資 <b class="${cls(a.ch.fi)}">${fz(a.ch.fi)}</b>`:""}</div>
     ${starBtn(S.id)}
   </div>`;
 }
-const PRE={fresh:a=>a.prev!=null&&a.prev<70&&a.sc.total>=70,vol:a=>a.sc.vr>=1.5&&a.chg>0,strong:a=>a.sc.rs>0.05,inst:a=>a.S.f5[a.i]!=null&&a.S.f5[a.i]>0,pull:a=>a.sc.total>=70&&a.sc.ext<=1};
+const PRE={fresh:a=>a.prev!=null&&a.prev<70&&a.sc.total>=70,vol:a=>a.sc.vr>=1.5&&a.chg>0,strong:a=>a.sc.rs>0.05,inst:a=>a.S.f5[a.i]!=null&&a.S.f5[a.i]>0,pull:a=>a.sc.total>=70&&a.sc.ext<=1,fbuy:a=>a.ch&&a.ch.fs>=3,tbuy:a=>a.ch&&a.ch.ts>=3,lowpe:a=>a.S.pe>0&&a.S.pe<15,hidy:a=>a.S.dy>=5};
 let shown=50;
 function renderPick(keep){
   if(!keep)shown=50;
   const q=$("#q").value.trim(),so=$("#sort").value,ind=$("#indSel").value,lq=+$("#liq").value||0;
   let L=ALL.filter(a=>(ptype==="all"||(ptype==="etf")===isETF(a))&&(filt==="all"||a.sig.k===filt)&&(!preset||PRE[preset](a))&&(!ind||a.S.ind===ind)&&(q||a.liq>=lq)&&(!q||a.S.id.includes(q)||a.S.name.includes(q)));
-  const key={score:a=>a.sc.total,delta:a=>delta(a),chg:a=>a.chg,vr:a=>a.sc.vr,rs:a=>a.sc.rs}[so]||(a=>a.sc.total);
+  const key={score:a=>a.sc.total,delta:a=>delta(a),chg:a=>a.chg,vr:a=>a.sc.vr,rs:a=>a.sc.rs,fi:a=>a.ch?a.ch.fiA:-1e15,it:a=>a.ch?a.ch.itA:-1e15,dy:a=>a.S.dy||0,pe:a=>a.S.pe>0?-a.S.pe:-1e9}[so]||(a=>a.sc.total);
   L.sort((x,y)=>key(y)-key(x)||y.sc.total-x.sc.total||y.liq-x.liq);
   $("#pickCount").textContent=`符合條件 ${L.length.toLocaleString()} 檔${q?"（搜尋時不限成交量）":""}，顯示前 ${Math.min(shown,L.length)} 檔`;
   const box=$("#pickList");box.className=vmode==="card"?"cards":"list";
@@ -841,6 +1014,7 @@ function showStock(id){
       <div><span>RSI14${qBtn("RSI")}</span><b>${S.rsi[i].toFixed(1)}</b></div><div><span>MACD 柱${qBtn("MACD")}</span><b class="${cls(S.hist[i])}">${S.hist[i].toFixed(2)}</b></div><div><span>ATR14${qBtn("ATR")}</span><b>${fmtP(S.atr[i])}</b></div>
       <div><span>量比${qBtn("VR")}</span><b>${sc.vr.toFixed(2)}</b></div><div><span>成交量</span><b>${S.v[i].toLocaleString()} 張</b></div><div><span>法人 5 日${qBtn("INST")}</span><b class="${cls(S.f5[i])}">${S.f5[i]==null?"—":(S.f5[i]>0?"+":"")+S.f5[i].toLocaleString()+" 張"}</b></div>
     </div></div>
+    ${chipPanel(a)}
   </div>
   <div class="panel" style="margin-top:14px"><h3>本策略在這檔的歷史回測（${S.d[60]} 起）${qBtn("BT")}</h3>
     <div class="kv num" style="margin-bottom:10px">
@@ -922,7 +1096,7 @@ function renderMethod(){
 
   <h3>資料管線</h3>
   <div class="flow">
-    <div><b>資料來源</b><span>上市股票清單、名稱與近期收盤取自臺灣證券交易所每日收盤行情（MI_INDEX），三大法人買賣超取自證交所 T86；2025-12 起的歷史 K 線與成交量取自 Yahoo Finance（非官方來源，已與證交所收盤價交叉比對）；產業分類取自 FinMind</span></div>
+    <div><b>資料來源</b><span>上市股票清單、名稱與近期收盤取自臺灣證券交易所每日收盤行情（MI_INDEX），三大法人買賣超取自證交所 T86 與櫃買中心（外資、投信分開，保留近 20 個交易日）；本益比、股價淨值比與殖利率取自證交所 BWIBBU 與櫃買中心；近 160 個交易日的歷史 K 線與成交量取自 Yahoo Finance（非官方來源，已與證交所收盤價交叉比對）；產業分類取自 FinMind</span></div>
     <div><b>資料品質</b><span>股數換算為張、停牌日沿用前收盤；上市未滿 80 個交易日的新股不評分；法人資料為最近幾個交易日，回測期間法人項目一律給中性分</span></div>
     <div><b>分析</b><span>MA5/20/60、RSI14（Wilder）、MACD(12,26,9)、ATR14、布林帶寬、量比、20 日相對 0050 強弱</span></div>
     <div><b>研究</b><span>固定規則回測，扣除交易成本，避免使用當日尚未發生的資料</span></div>
@@ -939,7 +1113,7 @@ function renderMethod(){
   </ul>
 
   <h3>這版還沒有納入的資料</h3>
-  <p>原文規劃的財報（TEJ）、新聞情緒（NewsAPI）、美國總經（FRED）與美股（Polygon、Alpha Vantage）都需要各自的 API 金鑰，這一版先不納入。評分因此只反映價量與籌碼，看不到基本面變化或突發消息。</p>
+  <p>本益比、淨值比與殖利率已依交易所每日公布值顯示，可用來篩選，但不計入評分。月營收、財報細項（毛利率、ROE）、新聞情緒與美國總經都需要額外的資料來源，這一版先不納入，因此評分看不到基本面變化或突發消息。</p>
 
   <h3>上線前檢查清單</h3>
   <ul class="check">
@@ -949,10 +1123,10 @@ function renderMethod(){
     <li class="ok">回測納入手續費與證交稅</li>
     <li class="ok">回測只用當時已知的資料，次日開盤成交</li>
     <li>除權息調整：目前使用未還原價，除權息日可能誤觸停損</li>
-    <li>樣本外測試與倖存者偏差：只含現存上市股、期間約 10 個月，需更長樣本驗證</li><li>上櫃（TPEx）股票尚未納入</li>
-    <li>基本面與新聞尚未整合</li>
+    <li>樣本外測試與倖存者偏差：只含現存上市櫃股、期間約 7 個月，需更長樣本驗證</li><li>上櫃（TPEx）股票只納入部分</li>
+    <li class="ok">估值（本益比、淨值比、殖利率）已納入</li><li>營收、財報與新聞尚未整合</li>
   </ul>
-  <p style="color:var(--muted);font-size:13px">資料快照日期：${LAST}。每個交易日 17:10 自動補上當天收盤 K 線（證交所開高低收）與三大法人買賣超；盤中約每 5 分鐘以最新報價暫估。</p>`;
+  <p style="color:var(--muted);font-size:13px">資料快照日期：${LAST}。每個交易日 17:10 自動補上當天收盤 K 線（證交所開高低收）、外資與投信買賣超、本益比與殖利率；盤中約每 5 分鐘以最新報價暫估。</p>`;
 }
 
 
@@ -1022,7 +1196,7 @@ function lookup(){const v=$("#pickIn").value.trim();if(!v)return;const id=v.spli
 $("#pickGo").onclick=lookup;$("#pickIn").onchange=lookup;$("#pickIn").onkeydown=e=>{if(e.key==="Enter")lookup()};
 
 /* ---------- 分頁與全域點擊 ---------- */
-const VIEWS=["home","pick","radar","stock","port","learn","method"];
+const VIEWS=["home","pick","radar","inst","flow","stock","port","learn","method"];
 function go(v){
   if(!VIEWS.includes(v))v="home";
   document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.v===v));
@@ -1031,6 +1205,8 @@ function go(v){
   if(v==="home")renderHome();
   if(v==="pick")renderPick(true);
   if(v==="stock"){if(!cur)showStock(ALL.slice().sort((a,b)=>b.sc.total-a.sc.total)[0].S.id);else requestAnimationFrame(drawChart)}
+  if(v==="inst")renderInst();
+  if(v==="flow")renderFlow();
   if(v==="port")renderPort();
   if(v==="learn")renderLearn();
   if(v==="method"&&!$("#v-method").innerHTML)renderMethod();
@@ -1039,6 +1215,7 @@ document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>go(b.datas
 document.addEventListener("click",e=>{
   const t=e.target;
   if(t.closest("a[href]"))return;
+  const tp=t.closest("[data-tip]");if(tp){e.stopPropagation();toast(tp.dataset.tip);return}
   const st=t.closest("[data-star]");if(st){e.stopPropagation();toggleStar(st.dataset.star);return}
   const g=t.closest("[data-g]");if(g){e.stopPropagation();openTerm(g.dataset.g);return}
   if(t.closest("[data-del]"))return;
@@ -1076,7 +1253,7 @@ function applyLive(doc){
   LIVE_ON=useBar;
   if(useBar){const cid=cur&&cur.S.id;recompute();rebuildBY();WATCH=WATCH.filter(id=>BY[id]);if(cid)cur=BY[cid];
     setCounts();$("#v-method").innerHTML="";renderRadar();
-    const v=curView();if(v==="home")renderHome();else if(v==="pick")renderPick(true);else if(v==="port")renderPort();else if(v==="learn")renderLearn();else if(v==="stock"&&cur){const y=scrollY;showStock(cur.S.id);scrollTo({top:y})}}
+    const v=curView();if(v==="home")renderHome();else if(v==="pick")renderPick(true);else if(v==="port")renderPort();else if(v==="learn")renderLearn();else if(v==="inst")renderInst();else if(v==="flow")renderFlow();else if(v==="stock"&&cur){const y=scrollY;showStock(cur.S.id);scrollTo({top:y})}}
   renderLiveChip();
 }
 setInterval(renderLiveChip,60000);
