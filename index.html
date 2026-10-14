@@ -1236,7 +1236,7 @@ const hhmm=t=>tpe(t).toISOString().slice(11,16);
 function mktOpen(){const n=tpe(Date.now()/1000),d=n.getUTCDay(),m=n.getUTCHours()*60+n.getUTCMinutes();return d>=1&&d<=5&&m>=540&&m<=810}
 function liveState(){if(!LIVE)return "off";const today=tpe(Date.now()/1000).toISOString().slice(0,10);
   if(LIVE.day===today&&mktOpen())return "on";if(LIVE.day===today)return "closed";return "old"}
-function liveNote(){const st=liveState();if(st==="on")return `<p class="livenote">盤中即時：價格與評分依 ${hhmm(LIVE.t)} 的報價重算，約每 5 分鐘更新一次，網頁每分鐘自動檢查（報價來源：${LIVE.src==="twse"?"證交所":"Yahoo Finance，約延遲 20 分鐘"}）。成交量還沒滿一天，量比與量能分數會暫時偏低，收盤後恢復正常。</p>`;
+function liveNote(){const st=liveState();if(st==="on")return `<p class="livenote">盤中即時：價格與評分依 ${hhmm(LIVE.t)} 的報價重算，約每 2～5 分鐘更新一次，網頁每分鐘自動檢查（報價來源：${LIVE.src==="twse"?"證交所":"Yahoo Finance，約延遲 20 分鐘"}）。成交量還沒滿一天，量比與量能分數會暫時偏低，收盤後恢復正常。</p>`;
   if(st==="closed")return `<p class="livenote">已依今日收盤報價（${hhmm(LIVE.t)}）重算所有評分與進出場價位。</p>`;return ""}
 function renderLiveChip(){const c=$("#liveChip"),st=liveState();c.className="live "+(st==="on"?"on":st==="closed"?"closed":"off");
   c.lastElementChild.textContent=st==="on"?`盤中即時 · ${hhmm(LIVE.t)} 更新`:st==="closed"?`今日收盤 · ${hhmm(LIVE.t)}`:LIVE?`最新報價 ${LIVE.day} ${hhmm(LIVE.t)}`:"收盤快照";
@@ -1257,7 +1257,9 @@ function applyLive(doc){
   renderLiveChip();
 }
 setInterval(renderLiveChip,60000);
-async function pollLive(){try{const r=await fetch("data/live.json?t="+Date.now(),{cache:"no-store"});if(r.ok)applyLive(await r.json())}catch(e){}}
+const LIVE_URLS=["https://raw.githubusercontent.com/loveflyfeeling-ops/stock-compass/main/data/live.json","data/live.json"];
+async function pollLive(){const docs=await Promise.all(LIVE_URLS.map(u=>fetch(u+"?t="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null)));
+  const best=docs.filter(d=>d&&d.t).sort((a,b)=>b.t-a.t)[0];if(best&&(!LIVE||best.t>LIVE.t))applyLive(best)}
 pollLive();setInterval(pollLive,60000);
 /* ---------- 啟動 ---------- */
 $("#asof").textContent=LAST;setCounts();
