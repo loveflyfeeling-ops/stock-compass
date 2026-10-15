@@ -798,7 +798,7 @@ function openSearch(){
   ${RECENT.length?`<div class="sub">最近查詢</div><div class="res">${RECENT.slice(0,5).map(id=>resBtn(BY[id])).join("")}</div>`:""}
   <div class="sub">常見搜尋</div><div class="presets">${POPULAR.map(id=>`<button class="chip" data-pick="${id}">${BY[id].S.name} ${id}</button>`).join("")}</div>`);
   const inp=$("#sq");inp.focus();
-  inp.oninput=()=>{const L=matches(inp.value);$("#sres").innerHTML=inp.value.trim()&&!L.length?`<div class="empty" style="padding:14px">找不到「${esc(inp.value)}」，請輸入上市股票代號或名稱。</div>`:L.map(resBtn).join("")};
+  inp.oninput=()=>{const L=matches(inp.value);$("#sres").innerHTML=inp.value.trim()&&!L.length?`<div class="empty" style="padding:14px">找不到「${esc(inp.value)}」，請輸入上市櫃股票代號或名稱。</div>`:L.map(resBtn).join("")};
   inp.onkeydown=e=>{if(e.key==="Enter"){const L=matches(inp.value);if(L[0])openStock(L[0].S.id)}};
 }
 $("#fab").onclick=openSearch;
@@ -818,7 +818,7 @@ function marketHTML(){
    <div><div class="lab">加權指數</div><div class="val num">${tx.toLocaleString("zh-TW",{maximumFractionDigits:2})} <small class="${cls(txc)}" style="font-size:13px">${pct(txc)}</small></div><div class="sub">0050 ${fmtP(bc)}（${bTrend}）</div></div>
    <div><div class="lab">市場溫度（站上月線比例）${qBtn("MA20")}</div><div class="val num">${(above*100).toFixed(0)}% <small style="font-size:13px;color:var(--muted)">${temp}</small></div><div class="therm"><i style="left:calc(${(above*100).toFixed(0)}% - 1px)"></i></div></div>
    <div><div class="lab">訊號分布 ${qBtn("SCORE")}</div><div class="val num"><span class="up">${bull}</span> / <span style="color:var(--gold)">${STK.length-bull-bear}</span> / <span class="down">${bear}</span></div><div class="sub">偏多 / 觀察 / 迴避（股票）</div></div>
-   <div><div class="lab">今日漲跌家數</div><div class="val num"><span class="up">${up}</span> / <span class="down">${dn}</span></div><div class="sub">上漲 / 下跌（上市普通股）</div></div></div>
+   <div><div class="lab">今日漲跌家數</div><div class="val num"><span class="up">${up}</span> / <span class="down">${dn}</span></div><div class="sub">上漲 / 下跌（上市櫃普通股）</div></div></div>
    <p class="intro" style="margin:8px 0 0"><b style="color:var(--ink)">今日操作溫度計：</b>${advice}</p>${liveNote()}`};
 }
 
@@ -1084,7 +1084,7 @@ function renderMethod(){
   const BT=ALL.filter(a=>a.liq>=1000);BT.forEach(a=>{const bt=backtest(a.S,B);bt.closed.forEach(t=>{n++;if(t.ret>0)w++;sum+=t.ret})});
   const bh=BT.reduce((s,a)=>s+(a.S.c[a.i]/a.S.c[60]-1),0)/BT.length;
   $("#v-method").innerHTML=`
-  <h3>全體回測結果</h3><p>對象：日均量 1,000 張以上的上市股票，共 ${BT.length} 檔。</p>
+  <h3>全體回測結果</h3><p>對象：日均量 1,000 張以上的上市櫃股票，共 ${BT.length} 檔。</p>
   <div class="panel"><div class="kv num">
     <div><span>回測期間</span><b>${B.d[60]} ~ ${LAST}</b></div>
     <div><span>總交易筆數</span><b>${n}</b></div>
@@ -1096,7 +1096,7 @@ function renderMethod(){
 
   <h3>資料管線</h3>
   <div class="flow">
-    <div><b>資料來源</b><span>上市股票清單、名稱與近期收盤取自臺灣證券交易所每日收盤行情（MI_INDEX），三大法人買賣超取自證交所 T86 與櫃買中心（外資、投信分開，保留近 20 個交易日）；本益比、股價淨值比與殖利率取自證交所 BWIBBU 與櫃買中心；近 160 個交易日的歷史 K 線與成交量取自 Yahoo Finance（非官方來源，已與證交所收盤價交叉比對）；產業分類取自 FinMind</span></div>
+    <div><b>資料來源</b><span>上市股票清單與收盤取自臺灣證券交易所（MI_INDEX、BWIBBU），上櫃股票清單與收盤取自櫃買中心，三大法人買賣超取自證交所 T86 與櫃買中心（外資、投信分開，保留近 20 個交易日）；本益比、股價淨值比與殖利率取自證交所 BWIBBU 與櫃買中心；近 160 個交易日的歷史 K 線與成交量取自 Yahoo Finance（非官方來源，已與證交所收盤價交叉比對）；產業分類取自 FinMind</span></div>
     <div><b>資料品質</b><span>股數換算為張、停牌日沿用前收盤；上市未滿 80 個交易日的新股不評分；法人資料為最近幾個交易日，回測期間法人項目一律給中性分</span></div>
     <div><b>分析</b><span>MA5/20/60、RSI14（Wilder）、MACD(12,26,9)、ATR14、布林帶寬、量比、20 日相對 0050 強弱</span></div>
     <div><b>研究</b><span>固定規則回測，扣除交易成本，避免使用當日尚未發生的資料</span></div>
@@ -1123,7 +1123,7 @@ function renderMethod(){
     <li class="ok">回測納入手續費與證交稅</li>
     <li class="ok">回測只用當時已知的資料，次日開盤成交</li>
     <li>除權息調整：目前使用未還原價，除權息日可能誤觸停損</li>
-    <li>樣本外測試與倖存者偏差：只含現存上市櫃股、期間約 7 個月，需更長樣本驗證</li><li>上櫃（TPEx）股票只納入部分</li>
+    <li>樣本外測試與倖存者偏差：只含現存上市櫃股、期間約 7 個月，需更長樣本驗證</li><li class="ok">已納入全部上市、上櫃普通股與主要 ETF，新上市櫃股票每天自動加入</li>
     <li class="ok">估值（本益比、淨值比、殖利率）已納入</li><li>營收、財報與新聞尚未整合</li>
   </ul>
   <p style="color:var(--muted);font-size:13px">資料快照日期：${LAST}。每個交易日 17:10 自動補上當天收盤 K 線（證交所開高低收）、外資與投信買賣超、本益比與殖利率；盤中約每 5 分鐘以最新報價暫估。</p>`;
@@ -1181,7 +1181,7 @@ function renderPort(){
   <p class="intro sec">健診規則與「方法與回測」相同：停損 = 成本 − 2 ATR、停利 = 成本 + 4 ATR、獲利後以移動停利上移、評分低於 45 出場。持股只存在這台裝置的瀏覽器裡，不會上傳。</p>`;
   $("#hForm").onsubmit=e=>{e.preventDefault();const v=$("#hId").value.trim(),id=v.split(/\s+/)[0];const a=BY[id]||ALL.find(x=>x.S.name===v)||matches(v)[0];
     const cost=+$("#hCost").value,sh=Math.round(+$("#hSh").value);const m=$("#hMsg");
-    if(!a){m.hidden=false;m.className="msg down";m.textContent=`找不到「${v}」，請輸入上市股票代號或名稱。`;return}
+    if(!a){m.hidden=false;m.className="msg down";m.textContent=`找不到「${v}」，請輸入上市櫃股票代號或名稱。`;return}
     if(!(cost>0)||!(sh>0)){m.hidden=false;m.className="msg down";m.textContent="請輸入大於 0 的買進均價與股數。";return}
     PORT=PORT.filter(h=>!h.demo);PORT.push({id:a.S.id,cost,sh});store.set("lpk-port",PORT);renderPort();toast(`已加入 ${a.S.name}`)};
   const dp=$("#demoPort");if(dp)dp.onclick=()=>{const P=topPicks().slice(0,2);const w=ALL.filter(a=>a.liq>=1000&&a.sig.k==="bear").sort((x,y)=>x.sc.total-y.sc.total)[0];
@@ -1192,7 +1192,7 @@ function renderPort(){
 
 /* ---------- 查詢 ---------- */
 $("#pickList2").innerHTML=ALL.slice().sort((a,b)=>a.S.id.localeCompare(b.S.id)).map(a=>`<option value="${a.S.id} ${esc(a.S.name)}"></option>`).join("");
-function lookup(){const v=$("#pickIn").value.trim();if(!v)return;const id=v.split(/\s+/)[0];let a=BY[id]||ALL.find(x=>x.S.name===v)||matches(v)[0];if(a)showStock(a.S.id);else $("#detail").innerHTML=`<div class="empty">找不到「${esc(v)}」，請輸入上市股票代號或名稱。</div>`}
+function lookup(){const v=$("#pickIn").value.trim();if(!v)return;const id=v.split(/\s+/)[0];let a=BY[id]||ALL.find(x=>x.S.name===v)||matches(v)[0];if(a)showStock(a.S.id);else $("#detail").innerHTML=`<div class="empty">找不到「${esc(v)}」，請輸入上市櫃股票代號或名稱。</div>`}
 $("#pickGo").onclick=lookup;$("#pickIn").onchange=lookup;$("#pickIn").onkeydown=e=>{if(e.key==="Enter")lookup()};
 
 /* ---------- 分頁與全域點擊 ---------- */
